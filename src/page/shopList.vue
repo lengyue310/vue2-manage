@@ -1,68 +1,75 @@
 <template>
     <div class="fillcontain">
         <head-top></head-top>
+        <el-form inline class="search-form" @submit.native.prevent="searchUsers">
+            <el-form-item>
+                <el-input v-model="search.username" placeholder="搜索患者姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-date-picker
+                    v-model="search.registe_time"
+                    type="date"
+                    placeholder="选择检查日期"
+                    value-format="yyyy-MM-dd">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="searchUsers">搜索</el-button>
+            </el-form-item>
+        </el-form>
         <div class="table_container">
             <el-table
                 :data="tableData"
                 style="width: 100%">
-                <el-table-column type="expand">
+                <!-- <el-table-column type="expand">
                   <template slot-scope="props">
-                    <el-form label-position="left" inline class="demo-table-expand">
-                      <el-form-item label="店铺名称">
-                        <span>{{ props.row.name }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺地址">
-                        <span>{{ props.row.address }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺介绍">
-                        <span>{{ props.row.description }}</span>
-                      </el-form-item>
-                      <el-form-item label="店铺 ID">
-                        <span>{{ props.row.id }}</span>
-                      </el-form-item>
-                      <el-form-item label="联系电话">
-                        <span>{{ props.row.phone }}</span>
-                      </el-form-item>
-                      <el-form-item label="评分">
-                        <span>{{ props.row.rating }}</span>
-                      </el-form-item>
-                      <el-form-item label="销售量">
-                        <span>{{ props.row.recent_order_num }}</span>
-                      </el-form-item>
-                      <el-form-item label="分类">
-                        <span>{{ props.row.category }}</span>
-                      </el-form-item>
-                    </el-form>
+                   
                   </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
-                  label="店铺名称"
+                  label="患者ID"
                   prop="name">
                 </el-table-column>
                 <el-table-column
-                  label="店铺地址"
+                  label="检查时间"
                   prop="address">
                 </el-table-column>
                 <el-table-column
-                  label="店铺介绍"
+                  label="模态"
+                  prop="description">
+                </el-table-column>
+                <el-table-column
+                  label="厂商"
+                  prop="description">
+                </el-table-column>
+                <el-table-column
+                  label="设备型号"
                   prop="description">
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template slot-scope="scope">
-                    <el-button
-                      size="mini"
-                      @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                    <el-button
-                      size="mini"
-                      type="Success"
-                      @click="addFood(scope.$index, scope.row)">添加食品</el-button>
-                    <el-button
-                      size="mini"
-                      type="danger"
-                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button type="text" @click="opendrawer(scope.row)">查看详情</el-button>
                   </template>
                 </el-table-column>
+
             </el-table>
+            <el-drawer
+                :title="title"
+                :visible.sync="dialog"
+                direction="rtl"
+                size="50%">
+                <el-table :data="gridData">
+                    <el-table-column property="number" label="序列号" width="70"></el-table-column>
+                    <el-table-column property="date" label="检查日期" width="100"></el-table-column>
+                    <el-table-column property="modality" label="检查模态" ></el-table-column>
+                    <el-table-column property="seriesid" label="序列信息" width="300"></el-table-column>
+                    <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="text" @click="dialog = true">序列详情</el-button>
+                    </template>
+                    </el-table-column>
+                    </el-table>
+                </el-drawer>
             <div class="Pagination">
                 <el-pagination
                   @size-change="handleSizeChange"
@@ -129,6 +136,10 @@
     export default {
         data(){
             return {
+                search: {
+                username: '',
+                registe_time: ''
+                },
                 baseUrl,
                 baseImgPath,
                 city: {},
@@ -139,9 +150,37 @@
                 currentPage: 1,
                 selectTable: {},
                 dialogFormVisible: false,
+                dialog: false,
+                activeNames: ['1'],
                 categoryOptions: [],
                 selectedCategory: [],
                 address: {},
+                gridData: [{
+                    number: '201',
+                    date: '2016-05-02',
+                    modality: 'MR',
+                    seriesid: '14151253165435212.456465.4564'
+                }, {
+                    number: '301',
+                    date: '2016-05-04',
+                    modality: 'CT',
+                    seriesid: '14151253165435212.456465.4564'
+                }, {
+                    number: '401',
+                    date: '2016-05-01',
+                    modality: 'MRA',
+                    seriesid: '14151253165435212.456465.4564'
+                }, {
+                    number: '501',
+                    date: '2016-05-03',
+                    modality: 'PET',
+                    seriesid: '14151253165435212.456465.4564'
+                }],
+                title: '',
+                sequences: [
+                    { description: 'tof_mra_3d', serialNumber: '601', serialDate:'20230807' },
+                    { description: 'F1', serialNumber: '501', serialDate:'20230807' }
+             ]
             }
         },
         created(){
@@ -218,6 +257,9 @@
                 this.offset = (val - 1)*this.limit;
                 this.getResturants()
             },
+            handleChange(val) {
+                console.log(val);
+            },
             handleEdit(index, row) {
                 this.selectTable = row;
                 this.address.address = row.address;
@@ -229,6 +271,12 @@
             },
             addFood(index, row){
                 this.$router.push({ path: 'addGoods', query: { restaurant_id: row.id }})
+            },
+
+            opendrawer(row){
+                this.dialog = true;
+                this.title = row.name
+                console.log(row.name)
             },
             async handleDelete(index, row) {
                 try{
@@ -331,6 +379,10 @@
     }
     .table_container{
         padding: 20px;
+    }
+    .search-form {
+        margin: 10px 0; /* 上下间距10px */
+        padding-left: 20px; /* 左侧间距20px */
     }
     .Pagination{
         display: flex;

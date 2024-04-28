@@ -45,11 +45,11 @@ const routes = [
 		},{
 			path: '/userList',
 			component: userList,
-			meta: ['数据管理', '用户列表'],
+			meta: ['数据管理', '影像复核'],
 		},{
 			path: '/shopList',
 			component: shopList,
-			meta: ['数据管理', '商家列表'],
+			meta: ['数据管理', '影像检索'],
 		},{
 			path: '/foodList',
 			component: foodList,
@@ -61,7 +61,7 @@ const routes = [
 		},{
 			path: '/adminList',
 			component: adminList,
-			meta: ['数据管理', '管理员列表'],
+			meta: ['数据管理', '影像管理'],
 		},{
 			path: '/visitor',
 			component: visitor,

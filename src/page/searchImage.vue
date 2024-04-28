@@ -1,34 +1,50 @@
 <template>
     <div class="fillcontain">
-        <head-top>
-        </head-top>
+        <head-top></head-top>
+        <div class="table_container">
+            <el-table
+                :data="tableData"
+                highlight-current-row
+                style="width: 100%">
+                <el-table-column
+                  type="index"
+                  width="100">
+                </el-table-column>
+                <el-table-column
+                  property="registe_time"
+                  label="注册日期"
+                  width="220">
+                </el-table-column>
+                <el-table-column
+                  property="username"
+                  label="用户姓名"
+                  width="220">
+                </el-table-column>
+                <el-table-column
+                  property="city"
+                  label="注册地址">
+                </el-table-column>
+            </el-table>
+            <div class="Pagination" style="text-align: left;margin-top: 10px;">
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentPage"
+                  :page-size="20"
+                  layout="total, prev, pager, next"
+                  :total="count">
+                </el-pagination>
+            </div>
+        </div>
     </div>
 </template>
 
-<!-- <template>
-    <div id="dwv">
-      <dwvVue />
-    </div>
-  </template> -->
-
 <script>
-    // import dwvVue from './components/dwv'
-
-    // export default {
-    // name: 'dwv',
-    // components: {
-    //     dwvVue
-    // }
-    // }
     import headTop from '../components/headTop'
     import {getUserList, getUserCount} from '@/api/getData'
     export default {
         data(){
             return {
-                search: {
-                username: '',
-                registe_time: ''
-                },
                 tableData: [{
                   registe_time: '2016-05-02',
                   username: '王小虎',
@@ -97,21 +113,8 @@
 </script>
 
 <style lang="less">
-// @import '../node_modules/vue-material/dist/theme/default.css'
-//   (prefers-color-scheme: light);
-// @import '../node_modules/vue-material/dist/theme/default-dark.css'
-//   (prefers-color-scheme: dark);
-
-// #app {
-//   text-align: center;
-//   height: 100vh;
-// }
 	@import '../style/mixin';
     .table_container{
         padding: 20px;
-    }
-    .search-form {
-        margin: 10px 0; /* 上下间距10px */
-        padding-left: 20px; /* 左侧间距20px */
     }
 </style>
